@@ -1,6 +1,9 @@
 
+data "aws_availability_zones" "available" {
+  state = "available"
+}
 resource "aws_vpc" "vpc1" {
-  cidr_block       = "10.0.0.0/16"
+  cidr_block       = var.cidr_block
   instance_tenancy = "default"
 
   tags = {
@@ -13,10 +16,10 @@ resource "aws_subnet" "subnet" {
   vpc_id     = aws_vpc.vpc1.id
 
   count = length(var.public_subnets)
-
+  
   cidr_block = var.public_subnets[count.index]
   map_public_ip_on_launch = true
-  availability_zone = "${var.region}${var.azs[count.index]}"
+  availability_zone = data.aws_availability_zones.available.names[count.index]
   tags = {
     Name = "Subnet-${count.index}"
   }
@@ -45,4 +48,10 @@ resource "aws_route_table" "web" {
     Name = "PublicRouteTable"
     Environment = var.Environment
   }
+}
+resource "aws_route_table_association" "a" {
+
+  count = length(var.public_subnets)
+  subnet_id      = element(aws_subnet.subnet[*].id,count.index)
+  route_table_id = aws_route_table.web.id
 }

@@ -14,7 +14,8 @@ resource "aws_key_pair" "deployer" {
 
     source = "./VPCtfFiles"
     region = var.region
-
+    public_subnets =  ["10.0.1.0/24","10.0.2.0/24"]
+    cidr_block = "10.0.0.0/16"
 }
 module "ASGForWebServers" {
 
@@ -24,8 +25,8 @@ module "ASGForWebServers" {
     Subnetid = module.VPCForWebServers.Subnetid
     lb_target_group_arn = module.ALBForWebServers.ALBTGArn
 
-    image_id = "ami-0d5bf08bc8017c83b"
-    instance_type = "t2.small"
+    image_id = var.image_id
+    instance_type = var.instance_type
     key_name = aws_key_pair.deployer.key_name
     depends_on = [
       module.VPCForWebServers,module.ALBForWebServers

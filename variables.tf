@@ -14,7 +14,14 @@ variable "webservers" {
   type=set(string)
   default = [ "TerraformWebServer1","TerraformWebServer2" ]
 }
-
+variable "instance_type" {
+  type = string
+  default = "t2.small"
+}
+variable "image_id" {
+  type = string
+  default = "ami-0d5bf08bc8017c83b"
+}
 
 
 variable "userData" {
